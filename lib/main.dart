@@ -27,6 +27,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFFF5F5F5),
+      // Header
       appBar: AppBar(
         backgroundColor: Color(0xFF2E1A47),
         title: Padding(
@@ -58,6 +59,18 @@ class HomePage extends StatelessWidget {
           ),
         ),
       ),
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [Container(height: 800, color: Colors.transparent)],
+              ),
+            ),
+          ),
+          buildFooter(),
+        ],
+      ),
     );
   }
 
@@ -81,6 +94,33 @@ class HomePage extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 10),
         child: Text(title, style: TextStyle(fontSize: 16, color: Colors.white)),
+      ),
+    );
+  }
+
+  // Footer
+  Widget buildFooter() {
+    return Container(
+      color: Color(0xFF2E1A47),
+      width: double.infinity,
+      padding: EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            '© 2025 S.ESE.ART - All Rights Reserved',
+            style: TextStyle(color: Colors.white),
+          ),
+          SizedBox(height: 5),
+          Text(
+            'Sara Alfaro Carrillo & Gwyneth Mendoza Castro',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+          Text(
+            'Proyecto Final - Centro Profesional JOYFE',
+            style: TextStyle(color: Colors.white),
+          ),
+        ],
       ),
     );
   }
