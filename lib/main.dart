@@ -46,7 +46,6 @@ class HomePage extends StatelessWidget {
               ),
               Row(
                 children: [
-                  // Menu
                   buildNavItem(context, 'Home', null),
                   buildNavItem(context, 'Products', Products()),
                   buildNavItem(context, 'Offers', Offers()),
@@ -60,11 +59,63 @@ class HomePage extends StatelessWidget {
         ),
       ),
       body: Column(
+        // Banner
         children: [
           Expanded(
             child: SingleChildScrollView(
-              child: Column(
-                children: [Container(height: 800, color: Colors.transparent)],
+              controller: _scrollController,
+              child: Container(
+                width:
+                    MediaQuery.of(context).size.width *
+                    0.85, // Adds some space on the sides
+                margin: EdgeInsets.symmetric(
+                  horizontal: MediaQuery.of(context).size.width * 0.075,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 40),
+                    // Hero Section
+                    Container(
+                      height: 250,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Stack(
+                        children: [
+                          // Image
+                          Positioned.fill(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.asset(
+                                'assets/banner.jpg',
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                          // Text
+                          Positioned(
+                            left: 20,
+                            top: 30,
+                            right: MediaQuery.of(context).size.width * 0.5,
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              color: Colors.black.withOpacity(0.5),
+                              child: Text(
+                                'Discover Unique Artworks',
+                                style: TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
