@@ -4,13 +4,8 @@ import 'products.dart';
 import 'offers.dart';
 import 'messages.dart';
 import 'profile.dart';
-import 'login_signup.dart';
 
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
+class LoggedIn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -50,7 +45,7 @@ class HomePage extends StatelessWidget {
                   buildNavItem(context, 'Products', Products()),
                   buildNavItem(context, 'Offers', Offers()),
                   buildNavItem(context, 'Messages', Messages()),
-                  buildNavItem(context, 'Login / Signup', LoginSignup()),
+                  buildNavItem(context, 'Profile', Profile())
                 ],
               ),
             ],
@@ -64,7 +59,9 @@ class HomePage extends StatelessWidget {
             child: SingleChildScrollView(
               controller: _scrollController,
               child: Container(
-                width: MediaQuery.of(context).size.width * 0.85, // Adds some space on the sides
+                width:
+                    MediaQuery.of(context).size.width *
+                    0.85, // Adds some space on the sides
                 margin: EdgeInsets.symmetric(
                   horizontal: MediaQuery.of(context).size.width * 0.075,
                 ),
