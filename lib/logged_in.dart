@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'products.dart';
-import 'offers.dart';
 import 'messages.dart';
 import 'profile.dart';
 
@@ -43,9 +42,8 @@ class HomePage extends StatelessWidget {
                 children: [
                   buildNavItem(context, 'Home', null),
                   buildNavItem(context, 'Products', Products()),
-                  buildNavItem(context, 'Offers', Offers()),
                   buildNavItem(context, 'Messages', Messages()),
-                  buildNavItem(context, 'Profile', Profile())
+                  buildNavItem(context, 'Profile', Profile()),
                 ],
               ),
             ],

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'products.dart';
-import 'offers.dart';
 import 'messages.dart';
-import 'profile.dart';
 import 'login_signup.dart';
 
 void main() {
@@ -48,7 +46,6 @@ class HomePage extends StatelessWidget {
                 children: [
                   buildNavItem(context, 'Home', null),
                   buildNavItem(context, 'Products', Products()),
-                  buildNavItem(context, 'Offers', Offers()),
                   buildNavItem(context, 'Messages', Messages()),
                   buildNavItem(context, 'Login / Signup', LoginSignup()),
                 ],
@@ -64,7 +61,9 @@ class HomePage extends StatelessWidget {
             child: SingleChildScrollView(
               controller: _scrollController,
               child: Container(
-                width: MediaQuery.of(context).size.width * 0.85, // Adds some space on the sides
+                width:
+                    MediaQuery.of(context).size.width *
+                    0.85, // Adds some space on the sides
                 margin: EdgeInsets.symmetric(
                   horizontal: MediaQuery.of(context).size.width * 0.075,
                 ),
