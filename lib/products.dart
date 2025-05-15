@@ -186,7 +186,7 @@ class HomePage extends StatelessWidget {
           final title =
               isFeatured ? 'Featured ${index + 1}' : 'Product ${index + 1}';
           final price = '${(index + 1) * 50}€';
-          final isOffer = !isFeatured && index % 4 == 0;
+          final isOffer = !isFeatured && index < 4;
           return buildProductCard(context, title, price, isOffer: isOffer);
         },
       ),
