@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 
-class Messages extends StatelessWidget {
+class MessagesPage extends StatelessWidget {
+  const MessagesPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: Text('Messages')),
-        body: Center(child: Text('Under construction!')),
+      title: 'S.ESE.ART',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        scaffoldBackgroundColor: const Color(0xFFF5F5F5),
       ),
     );
   }
