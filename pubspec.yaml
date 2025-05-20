@@ -62,6 +62,7 @@ flutter:
   assets:
     - assets/banner.jpg
     - assets/about_us.jpg
+    - assets/art.jpg
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

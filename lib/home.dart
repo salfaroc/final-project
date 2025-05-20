@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 // import 'package:auto_size_text/auto_size_text.dart'; // flutter pub add auto_size_text
-import 'package:url_launcher/url_launcher.dart'; // flutter pub add url_launcher
+// import 'package:url_launcher/url_launcher.dart'; // flutter pub add url_launcher
 //import 'home.dart';
 import 'orders.dart';
 import 'messages.dart';
@@ -200,7 +200,6 @@ class HomePage extends StatelessWidget {
                           ],
                         ),
                       ),
-
                       // Divider
                       Container(
                         width: 1,
@@ -208,7 +207,6 @@ class HomePage extends StatelessWidget {
                         color: Colors.white24,
                         margin: const EdgeInsets.symmetric(horizontal: 32),
                       ),
-
                       // Legal and Technology
                       SizedBox(
                         width: 300,
