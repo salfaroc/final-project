@@ -47,49 +47,94 @@ class HomePage extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.fromLTRB(150, 30, 150, 50),
         // Banner
-        child: Container(
-          height: 250,
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
-          child: Stack(
-            children: [
-              // Image
-              Positioned.fill(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.asset('assets/banner.jpg', fit: BoxFit.cover),
-                ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Banner
+            Container(
+              height: 250,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
               ),
-              // Dark overlay
-              Positioned.fill(
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    color: Colors.black.withOpacity(0.4),
-                  ),
-                ),
-              ),
-              // Text container
-              Positioned(
-                left: 24,
-                top: 30,
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  color: Colors.black.withOpacity(0.5),
-                  child: const Text(
-                    'Discover Unique Artworks',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+              child: Stack(
+                children: [
+                  // Image
+                  Positioned.fill(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.asset(
+                        'assets/banner.jpg',
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
-                ),
+                  // Text container
+                  Positioned(
+                    left: 24,
+                    top: 30,
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      color: Colors.black.withOpacity(0.5),
+                      child: const Text(
+                        'Discover Unique Artworks',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 40), // space between banner and About Us
+            // About Us
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Left-side image
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.asset(
+                    'assets/about_us.jpg',
+                    width: 500,
+                    height: 250,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                const SizedBox(width: 24),
+                // Right-side text
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text(
+                        'About us!',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 12),
+                      Text(
+                        'We are a passionate team of students from Centro Profesional JOYFE, currently in our final year of Desarrollo de Aplicaciones Multiplataforma (DAM). '
+                        'This project is our Trabajo de Fin de Grado (TFG), a milestone that reflects everything we’ve learned and achieved over the past two years.\n\n'
+                        'S.ESE.ART was born from our shared love for technology and creativity. We wanted to create a platform that’s both simple and elegant, '
+                        'where digital artworks can be discovered, appreciated, and shared by everyone.',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(width: 24),
+            // Product cards
+          ],
         ),
-        // About Us
       ),
+      // Footer
     );
   }
 
