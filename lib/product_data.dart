@@ -9,7 +9,7 @@ List<Product> getProducts() {
       category: 'Surrealism',
       stockQuantity: 3,
       createdAt: DateTime(2025, 1, 15),
-      imageUrl: 'assets/images/art.jpg',
+      imageUrl: 'assets/art.jpg',
       isOffer: false,
     ),
     Product(
@@ -19,7 +19,7 @@ List<Product> getProducts() {
       category: 'Landscape',
       stockQuantity: 5,
       createdAt: DateTime(2025, 2, 5),
-      imageUrl: 'assets/images/art.jpg',
+      imageUrl: 'assets/art.jpg',
       isOffer: false,
     ),
     Product(
@@ -29,7 +29,7 @@ List<Product> getProducts() {
       category: 'Abstract',
       stockQuantity: 2,
       createdAt: DateTime(2025, 3, 8),
-      imageUrl: 'assets/images/art.jpg',
+      imageUrl: 'assets/art.jpg',
       isOffer: false,
     ),
     Product(
@@ -39,7 +39,7 @@ List<Product> getProducts() {
       category: 'Digital Art',
       stockQuantity: 4,
       createdAt: DateTime(2025, 1, 20),
-      imageUrl: 'assets/images/art.jpg',
+      imageUrl: 'assets/art.jpg',
       isOffer: true,
     ),
     Product(
@@ -49,7 +49,7 @@ List<Product> getProducts() {
       category: 'Nature',
       stockQuantity: 6,
       createdAt: DateTime(2025, 2, 12),
-      imageUrl: 'assets/images/art.jpg',
+      imageUrl: 'assets/art.jpg',
       isOffer: false,
     ),
     Product(
@@ -59,8 +59,8 @@ List<Product> getProducts() {
       category: 'Modern',
       stockQuantity: 2,
       createdAt: DateTime(2025, 3, 2),
-      imageUrl: 'assets/images/art.jpg',
-      isOffer: false,
+      imageUrl: 'assets/art.jpg',
+      isOffer: true,
     ),
     Product(
       name: 'Neon Samurai',
@@ -69,7 +69,7 @@ List<Product> getProducts() {
       category: 'Sci-Fi',
       stockQuantity: 1,
       createdAt: DateTime(2025, 2, 28),
-      imageUrl: 'assets/images/art.jpg',
+      imageUrl: 'assets/art.jpg',
       isOffer: false,
     ),
     Product(
@@ -79,7 +79,7 @@ List<Product> getProducts() {
       category: 'Minimalist',
       stockQuantity: 10,
       createdAt: DateTime(2025, 1, 10),
-      imageUrl: 'assets/images/art.jpg',
+      imageUrl: 'assets/art.jpg',
       isOffer: true,
     ),
     Product(
@@ -89,7 +89,7 @@ List<Product> getProducts() {
       category: 'Pixel Art',
       stockQuantity: 7,
       createdAt: DateTime(2025, 3, 18),
-      imageUrl: 'assets/images/art.jpg',
+      imageUrl: 'assets/art.jpg',
       isOffer: false,
     ),
     Product(
@@ -99,7 +99,7 @@ List<Product> getProducts() {
       category: 'Expressionism',
       stockQuantity: 3,
       createdAt: DateTime(2025, 2, 22),
-      imageUrl: 'assets/images/art.jpg',
+      imageUrl: 'assets/art.jpg',
       isOffer: false,
     ),
     Product(
@@ -109,7 +109,7 @@ List<Product> getProducts() {
       category: 'Fantasy',
       stockQuantity: 2,
       createdAt: DateTime(2025, 1, 30),
-      imageUrl: 'assets/images/art.jpg',
+      imageUrl: 'assets/art.jpg',
       isOffer: false,
     ),
     Product(
@@ -119,7 +119,7 @@ List<Product> getProducts() {
       category: 'Abstract Landscape',
       stockQuantity: 5,
       createdAt: DateTime(2025, 3, 12),
-      imageUrl: 'assets/images/art.jpg',
+      imageUrl: 'assets/art.jpg',
       isOffer: true,
     ),
     Product(
@@ -129,7 +129,7 @@ List<Product> getProducts() {
       category: 'Street Art',
       stockQuantity: 4,
       createdAt: DateTime(2025, 2, 17),
-      imageUrl: 'assets/images/art.jpg',
+      imageUrl: 'assets/art.jpg',
       isOffer: false,
     ),
     Product(
@@ -139,7 +139,7 @@ List<Product> getProducts() {
       category: 'Gothic',
       stockQuantity: 3,
       createdAt: DateTime(2025, 3, 5),
-      imageUrl: 'assets/images/art.jpg',
+      imageUrl: 'assets/art.jpg',
       isOffer: false,
     ),
     Product(
@@ -149,7 +149,7 @@ List<Product> getProducts() {
       category: 'Contemporary',
       stockQuantity: 3,
       createdAt: DateTime(2025, 1, 25),
-      imageUrl: 'assets/images/art.jpg',
+      imageUrl: 'assets/art.jpg',
       isOffer: false,
     ),
     Product(
@@ -159,8 +159,8 @@ List<Product> getProducts() {
       category: 'Sketch',
       stockQuantity: 8,
       createdAt: DateTime(2025, 3, 10),
-      imageUrl: 'assets/images/art.jpg',
-      isOffer: true,
+      imageUrl: 'assets/art.jpg',
+      isOffer: false,
     ),
   ];
 }

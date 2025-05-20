@@ -5,6 +5,11 @@ import 'package:flutter/material.dart';
 import 'orders.dart';
 import 'messages.dart';
 import 'login_signup.dart';
+import 'product.dart';
+import 'product_data.dart';
+import 'product_card.dart';
+
+final List<Product> products = getProducts();
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -94,9 +99,7 @@ class HomePage extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(
-                    height: 40,
-                  ), // space between banner and About Us
+                  const SizedBox(height: 40),
                   // About Us
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -137,8 +140,35 @@ class HomePage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(width: 24),
+                  const SizedBox(height: 40),
                   // Product cards
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: Text(
+                      'All Products',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: EdgeInsets.zero,
+                    itemCount: products.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 4,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                          childAspectRatio: 0.7,
+                        ),
+                    itemBuilder: (context, index) {
+                      return ProductCard(product: products[index]);
+                    },
+                  ),
                 ],
               ),
             ),
