@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 // import 'package:auto_size_text/auto_size_text.dart'; // flutter pub add auto_size_text
 // import 'package:url_launcher/url_launcher.dart'; // flutter pub add url_launcher
-import 'logged_in.dart';
+// import 'logged_in.dart';
 import 'orders.dart';
 import 'messages.dart';
 import 'profile.dart';
@@ -44,7 +44,7 @@ class LoggedInPage extends StatelessWidget {
           ), // messages.dart
           _buildMenuItem(
             context,
-            'Login / Signup',
+            'Profile',
             const ProfilePage(),
           ), // login.dart
           const SizedBox(width: 24),
