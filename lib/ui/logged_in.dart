@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 // import 'package:auto_size_text/auto_size_text.dart'; // flutter pub add auto_size_text
 // import 'package:url_launcher/url_launcher.dart'; // flutter pub add url_launcher
-// import 'home.dart';
-// import 'orders.dart';
-// import 'messages.dart';
-import 'login.dart';
-import 'product.dart';
+// import 'logged_in.dart';
+import 'orders.dart';
+import 'messages.dart';
+import 'profile.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../models/collection_products.dart';
+import '../../services/api_service.dart';
 import 'product_data.dart';
 import 'product_card.dart';
 
-final List<Product> products = getProducts();
+// final List<Product> products = getProducts();
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class LoggedInPage extends StatelessWidget {
+  const LoggedInPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +25,7 @@ class HomePage extends StatelessWidget {
         elevation: 0,
         titleSpacing: 24,
         title: const Text(
-          'S.ESE.ART',
+          'S.ESE.ART - logged in',
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
@@ -31,23 +33,12 @@ class HomePage extends StatelessWidget {
           ),
         ),
         actions: [
-          _buildMenuItem(context, 'Home', const HomePage()), // home.dart
-          // _buildMenuItem(
-          //   context,
-          //   'My Orders',
-          //   const OrdersPage(),
-          // ), // orders.dart
-          // _buildMenuItem(
-          //   context,
-          //   'Messages',
-          //   const MessagesPage(),
-          // ), // messages.dart
-          _buildMenuItem(
-            context,
-            'Login / Signup',
-            const LoginPage(),
-          ), // login.dart
-          const SizedBox(width: 24),
+          _buildMenuItem(context, 'Home', const LoggedInPage()),
+          _buildMenuItem(context, 'My Orders', const OrdersPage()),
+          _buildMenuItem(context, 'Messages', const MessagesPage()),
+          _buildMenuItem(context, 'Profile', const ProfilePage()),
+          _buildLogoutButton(context),
+  const SizedBox(width: 24),
         ],
       ),
       body: SingleChildScrollView(
@@ -155,7 +146,7 @@ class HomePage extends StatelessWidget {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     padding: EdgeInsets.zero,
-                    itemCount: products.length,
+                    // itemCount: products.length,
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 4,
@@ -164,7 +155,7 @@ class HomePage extends StatelessWidget {
                           childAspectRatio: 0.7,
                         ),
                     itemBuilder: (context, index) {
-                      return ProductCard(product: products[index]);
+                      // return ProductCard(product: products[index]);
                     },
                   ),
                 ],
@@ -322,4 +313,51 @@ class HomePage extends StatelessWidget {
       ),
     );
   }
+
+Widget _buildLogoutButton(BuildContext context) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 8),
+    child: GestureDetector(
+      onTap: () async {
+        final confirmLogout = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Cerrar sesión'),
+            content: const Text('¿Estás seguro de que deseas cerrar sesión?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Cancelar'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Cerrar sesión'),
+              ),
+            ],
+          ),
+        );
+
+        if (confirmLogout == true) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.remove('auth_token');
+          Navigator.pushReplacementNamed(context, '/');
+        }
+      },
+      child: const Center(
+        child: Text(
+          'Logout',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            decoration: TextDecoration.underline,
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+
+
 }

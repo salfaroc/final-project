@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'signup.dart';
 import 'logged_in.dart';
+import '../../services/api_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -13,6 +14,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -21,6 +23,30 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
+  // llamada api_servie para que funcione la funcion incio Sesion Admin
+  Future<void> _handleLogin() async {
+  setState(() {
+    _isLoading = true;
+  });
+
+  try {
+    final token = await ApiService.loginAdmin(email: _emailController.text.trim(), password: _passwordController.text);
+    
+    setState(() => _isLoading = false);
+
+    if (token.isNotEmpty) {
+      Navigator.pushNamed(context, '/logged_in');
+    }
+  } catch (e) {
+    setState(() => _isLoading = false);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error: ${e.toString()}')),
+    );
+  }
+}
+
+// diseño se la pagina 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -101,32 +127,24 @@ class _LoginPageState extends State<LoginPage> {
 
                 // Login button
                 SizedBox(
-                  width: 250,
+                  width: double.infinity,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF2E1A47),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => LoggedInPage()),
-                      );
-                    },
-                    child: const Text('Login', style: TextStyle(fontSize: 16)),
+                    onPressed: _isLoading ? null : _handleLogin,
+                    child: _isLoading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text('Login', style: TextStyle(fontSize: 16)),
                   ),
                 ),
                 const SizedBox(height: 16),
 
-                // Sign-up link
+                 // Sign-up link
                 GestureDetector(
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const SignUpPage(),
-                      ),
-                    );
+                    Navigator.pushNamed(context, '/signup');
                   },
                   child: const Text(
                     "Don't have an account? Sign-up here!",

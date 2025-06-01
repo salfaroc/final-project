@@ -1,18 +1,44 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 // import 'package:auto_size_text/auto_size_text.dart'; // flutter pub add auto_size_text
 // import 'package:url_launcher/url_launcher.dart'; // flutter pub add url_launcher
-// import 'logged_in.dart';
-import 'orders.dart';
-import 'messages.dart';
-import 'profile.dart';
-import 'product.dart';
-import 'product_data.dart';
+// import 'home.dart';
+// import 'orders.dart';
+// import 'messages.dart';
+import 'package:http/http.dart' as http;
+
+import 'login.dart';
+import '../../models/collection_products.dart';
+import '../../services/api_service.dart';
 import 'product_card.dart';
 
-final List<Product> products = getProducts();
 
-class LoggedInPage extends StatelessWidget {
-  const LoggedInPage({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  List<Product> products = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProducts();
+  }
+
+void _loadProducts() async {
+  try {
+    final loadedProducts = await ApiService.fetchProducts();
+    setState(() {
+      products = loadedProducts;
+    });
+  } catch (e) {
+    print('Error: $e');
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -31,22 +57,8 @@ class LoggedInPage extends StatelessWidget {
           ),
         ),
         actions: [
-          _buildMenuItem(context, 'Home', const LoggedInPage()), // home.dart
-          _buildMenuItem(
-            context,
-            'My Orders',
-            const OrdersPage(),
-          ), // orders.dart
-          _buildMenuItem(
-            context,
-            'Messages',
-            const MessagesPage(),
-          ), // messages.dart
-          _buildMenuItem(
-            context,
-            'Profile',
-            const ProfilePage(),
-          ), // login.dart
+          _buildMenuItem(context, 'Home', '/'),
+          _buildMenuItem(context, 'Login / Signup', '/login'),
           const SizedBox(width: 24),
         ],
       ),
@@ -59,7 +71,7 @@ class LoggedInPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Banner
+                
                   Container(
                     height: 250,
                     decoration: BoxDecoration(
@@ -303,23 +315,20 @@ class LoggedInPage extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuItem(BuildContext context, String title, Widget page) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: GestureDetector(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => page),
-          );
-        },
-        child: Center(
-          child: Text(
-            title,
-            style: const TextStyle(color: Colors.white, fontSize: 16),
-          ),
+Widget _buildMenuItem(BuildContext context, String title, String routeName) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 8),
+    child: GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, routeName);
+      },
+      child: Center(
+        child: Text(
+          title,
+          style: const TextStyle(color: Colors.white, fontSize: 16),
         ),
       ),
-    );
+    ),
+  );
   }
 }
