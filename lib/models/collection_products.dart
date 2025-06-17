@@ -2,18 +2,20 @@ import 'package:mongo_dart/mongo_dart.dart';
 
 class Product {
   ObjectId? id;
-  String name; // Nombre del producto
-  String description; // Descripción del producto
-  double price; // Precio del producto
-  String category; // Categoría a la que pertenece el producto
-  int stockQuantity; // Cantidad disponible en stock
-  DateTime createdAt; // Fecha en que se creó el producto
+  String image; 
+  String name; 
+  String description; 
+  double price; 
+  String category; 
+  int stockQuantity; 
+  DateTime createdAt; 
   int width; 
   int length;
 
   Product({
     this.id,
     required this.name,
+    required this.image,
     required this.description,
     required this.price,
     required this.category,
@@ -23,31 +25,35 @@ class Product {
     required this.length,
   });
 
+  factory Product.fromJson(Map<String, dynamic> json) {
+    return Product(
+      id: json['_id'] != null ? ObjectId.fromHexString(json['_id']) : null,
+      image: json['image'],
+      name: json['name'],
+      description: json['description'],
+      price: (json['price'] as num).toDouble(),
+      category: json['category'],
+      stockQuantity: json['stock_quantity'],
+      createdAt: DateTime.parse(json['created_at']),
+      width: json['width'],
+      length: json['length'],
+    );
+  }
+
   Map<String, dynamic> toMap() {
     return {
-      '_id': id,
+      '_id': id?.oid,
       'name': name,
+      'image': image,
       'description': description,
       'price': price,
       'category': category,
       'stock_quantity': stockQuantity,
-      'created_at': createdAt.toUtc(),
+      'created_at': createdAt.toUtc().toIso8601String(),
       'width' : width,
       'length' : length,
     };
   }
 
-  factory Product.fromJson(Map<String, dynamic> map) {
-    return Product(
-      id: map['_id'],
-      name: map['name'],
-      description: map['description'],
-      price: map['price'],
-      category: map['category'],
-      stockQuantity: map['stock_quantity'],
-      createdAt: DateTime.parse(map['created_at']),
-      width: map['width'],
-      length: map['length'],
-    );
-  }
+
 }

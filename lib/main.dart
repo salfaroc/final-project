@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart'; // flutter pub add google_fonts
-import 'home.dart';
-import 'login.dart';
-import 'signup.dart';
-import 'logged_in.dart';
+import 'ui/home.dart';
+import 'ui/login.dart';
+import 'ui/signup.dart';
+import 'ui/logged_in.dart';
+import 'ui/logged_cutomer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 
@@ -25,7 +26,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'S.ESE.ART',
+      title: 'S.ESE.ART - main',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         scaffoldBackgroundColor: const Color(0xFFF5F5F5),
@@ -36,7 +37,8 @@ class MyApp extends StatelessWidget {
         '/': (context) => const HomePage(),
         '/login': (context) => const LoginPage(),
         '/signup': (context) => const SignUpPage(),
-        '/logged_in': (context) => const LoggedInPage(),
+        '/logged_in': (context) => const LoggedInPage(),               // admin
+        '/logged_customer': (context) => const LoggedCustomerPage(),  // cliente
         // aquí más pantallas según necesites
       },
     );

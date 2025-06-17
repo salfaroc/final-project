@@ -1,47 +1,15 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-// import 'package:auto_size_text/auto_size_text.dart'; // flutter pub add auto_size_text
-// import 'package:url_launcher/url_launcher.dart'; // flutter pub add url_launcher
-// import 'home.dart';
-// import 'orders.dart';
-// import 'messages.dart';
-import 'package:http/http.dart' as http;
-
-import '../ui/login.dart';
-import '../../models/collection_products.dart';
-import '../../services/api_service.dart';
-import '../ui/product_card.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class LoggedCustomerPage extends StatelessWidget {
+  const LoggedCustomerPage({super.key});
 
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  List<Product> products = [];
-  bool isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadProducts();
+  Future<void> _logout(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('admin_token');
+    Navigator.pushReplacementNamed(context, '/login');
   }
-
-void _loadProducts() async {
-  try {
-    final loadedProducts = await ApiService.fetchProducts();
-    setState(() {
-      products = loadedProducts;
-      isLoading = false;
-    });
-  } catch (e) {
-    print('Error: $e');
-    setState(() => isLoading = false);
-  }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +20,7 @@ void _loadProducts() async {
         elevation: 0,
         titleSpacing: 24,
         title: const Text(
-          'S.ESE.ART - home',
+          'S.ESE.ART - logged in CUSTOMER',
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
@@ -60,10 +28,18 @@ void _loadProducts() async {
           ),
         ),
         actions: [
-          _buildMenuItem(context, 'Home', '/'),
-          _buildMenuItem(context, 'Login / Signup', '/login'),
-          const SizedBox(width: 24),
-        ],
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () => _logout(context),
+          )
+
+          // _buildMenuItem(context, 'Home', const LoggedInPage()),
+          // _buildMenuItem(context, 'My Orders', const OrdersPage()),
+          // _buildMenuItem(context, 'Messages', const MessagesPage()),
+          // _buildMenuItem(context, 'Profile', const ProfilePage()),
+          // _buildLogoutButton(context),
+  // const SizedBox(width: 24),
+        ], 
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -74,7 +50,7 @@ void _loadProducts() async {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                
+                  // Banner
                   Container(
                     height: 250,
                     decoration: BoxDecoration(
@@ -142,10 +118,10 @@ void _loadProducts() async {
                             ),
                             SizedBox(height: 12),
                             Text(
-                              'We are a passionate team of students from Centro Profesional JOYFE, currently in our final year of Desarrollo de Aplicaciones Multiplataforma (DAM). '
-                              'This project is our Trabajo de Fin de Grado (TFG), a milestone that reflects everything we’ve learned and achieved over the past two years.\n\n'
-                              'S.ESE.ART was born from our shared love for technology and creativity. We wanted to create a platform that’s both simple and elegant, '
-                              'where digital artworks can be discovered, appreciated, and shared by everyone.',
+                              'Página realizada por estudiantes del Centro Profesional Joyfe en el último curso de Desarrollo de Aplicaciones Multiplataforma (DAM). '
+                              'Este proyecto es nuestro Trabajo de Fin de Grado (TFG), que refleja todo lo que hemos aprendido durante los dos cursos.\n\n'
+                              'S.ESE.ART nace de querer unir la tecnología y la creatividad dando como resultado una plataforma sencilla y elegante, '
+                              'donde todos pueden ver y seleccionar obras de arte realizadas por una de las alumnas del equipo.',
                               style: TextStyle(fontSize: 16),
                             ),
                           ],
@@ -166,23 +142,22 @@ void _loadProducts() async {
                     ),
                   ),
                   const SizedBox(height: 30),
-                  isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        padding: EdgeInsets.zero,
-                        itemCount: products.length,
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: EdgeInsets.zero,
+                    // itemCount: products.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 4,
                           crossAxisSpacing: 16,
                           mainAxisSpacing: 16,
                           childAspectRatio: 0.7,
                         ),
-                        itemBuilder: (context, index) {
-                          return ProductCard(product: products[index]);
-                        },
-                      ),
+                    itemBuilder: (context, index) {
+                      // return ProductCard(product: products[index]);
+                    },
+                  ),
                 ],
               ),
             ),
@@ -319,20 +294,67 @@ void _loadProducts() async {
     );
   }
 
-Widget _buildMenuItem(BuildContext context, String title, String routeName) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 8),
-    child: GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(context, routeName);
-      },
-      child: Center(
-        child: Text(
-          title,
-          style: const TextStyle(color: Colors.white, fontSize: 16),
-        ),
-      ),
-    ),
-  );
-  }
+  // Widget _buildMenuItem(BuildContext context, String title, Widget page) {
+  //   return Padding(
+  //     padding: const EdgeInsets.symmetric(horizontal: 8),
+  //     child: GestureDetector(
+  //       onTap: () {
+  //         Navigator.push(
+  //           context,
+  //           MaterialPageRoute(builder: (context) => page),
+  //         );
+  //       },
+  //       child: Center(
+  //         child: Text(
+  //           title,
+  //           style: const TextStyle(color: Colors.white, fontSize: 16),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
+
+// Widget _buildLogoutButton(BuildContext context) {
+//   return Padding(
+//     padding: const EdgeInsets.symmetric(horizontal: 8),
+//     child: GestureDetector(
+//       onTap: () async {
+//         final confirmLogout = await showDialog<bool>(
+//           context: context,
+//           builder: (context) => AlertDialog(
+//             title: const Text('Cerrar sesión'),
+//             content: const Text('¿Estás seguro de que deseas cerrar sesión?'),
+//             actions: [
+//               TextButton(
+//                 onPressed: () => Navigator.of(context).pop(false),
+//                 child: const Text('Cancelar'),
+//               ),
+//               TextButton(
+//                 onPressed: () => Navigator.of(context).pop(true),
+//                 child: const Text('Cerrar sesión'),
+//               ),
+//             ],
+//           ),
+//         );
+
+//         if (confirmLogout == true) {
+//           final prefs = await SharedPreferences.getInstance();
+//           await prefs.remove('auth_token');
+//           Navigator.pushReplacementNamed(context, '/');
+//         }
+//       },
+//       child: const Center(
+//         child: Text(
+//           'Logout',
+//           style: TextStyle(
+//             color: Colors.white,
+//             fontSize: 16,
+//             fontWeight: FontWeight.bold,
+//             decoration: TextDecoration.underline,
+//           ),
+//         ),
+//       ),
+//     ),
+//   );
+// }
 }

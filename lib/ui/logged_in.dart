@@ -2,19 +2,25 @@ import 'package:flutter/material.dart';
 // import 'package:auto_size_text/auto_size_text.dart'; // flutter pub add auto_size_text
 // import 'package:url_launcher/url_launcher.dart'; // flutter pub add url_launcher
 // import 'logged_in.dart';
-import 'orders.dart';
-import 'messages.dart';
-import 'profile.dart';
+// import 'orders.dart';
+// import 'messages.dart';
+// import 'profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../models/collection_products.dart';
-import '../../services/api_service.dart';
-import 'product_data.dart';
-import 'product_card.dart';
+// import '../../models/collection_products.dart';
+// import '../../services/api_service.dart';
+// import 'product_data.dart';
+// import 'product_card.dart';
 
 // final List<Product> products = getProducts();
 
 class LoggedInPage extends StatelessWidget {
   const LoggedInPage({super.key});
+
+  Future<void> _logout(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('admin_token');
+    Navigator.pushReplacementNamed(context, '/login');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,13 +39,18 @@ class LoggedInPage extends StatelessWidget {
           ),
         ),
         actions: [
-          _buildMenuItem(context, 'Home', const LoggedInPage()),
-          _buildMenuItem(context, 'My Orders', const OrdersPage()),
-          _buildMenuItem(context, 'Messages', const MessagesPage()),
-          _buildMenuItem(context, 'Profile', const ProfilePage()),
-          _buildLogoutButton(context),
-  const SizedBox(width: 24),
-        ],
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () => _logout(context),
+          )
+
+          // _buildMenuItem(context, 'Home', const LoggedInPage()),
+          // _buildMenuItem(context, 'My Orders', const OrdersPage()),
+          // _buildMenuItem(context, 'Messages', const MessagesPage()),
+          // _buildMenuItem(context, 'Profile', const ProfilePage()),
+          // _buildLogoutButton(context),
+  // const SizedBox(width: 24),
+        ], 
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -314,50 +325,47 @@ class LoggedInPage extends StatelessWidget {
     );
   }
 
-Widget _buildLogoutButton(BuildContext context) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 8),
-    child: GestureDetector(
-      onTap: () async {
-        final confirmLogout = await showDialog<bool>(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Cerrar sesión'),
-            content: const Text('¿Estás seguro de que deseas cerrar sesión?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('Cancelar'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                child: const Text('Cerrar sesión'),
-              ),
-            ],
-          ),
-        );
+// Widget _buildLogoutButton(BuildContext context) {
+//   return Padding(
+//     padding: const EdgeInsets.symmetric(horizontal: 8),
+//     child: GestureDetector(
+//       onTap: () async {
+//         final confirmLogout = await showDialog<bool>(
+//           context: context,
+//           builder: (context) => AlertDialog(
+//             title: const Text('Cerrar sesión'),
+//             content: const Text('¿Estás seguro de que deseas cerrar sesión?'),
+//             actions: [
+//               TextButton(
+//                 onPressed: () => Navigator.of(context).pop(false),
+//                 child: const Text('Cancelar'),
+//               ),
+//               TextButton(
+//                 onPressed: () => Navigator.of(context).pop(true),
+//                 child: const Text('Cerrar sesión'),
+//               ),
+//             ],
+//           ),
+//         );
 
-        if (confirmLogout == true) {
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.remove('auth_token');
-          Navigator.pushReplacementNamed(context, '/');
-        }
-      },
-      child: const Center(
-        child: Text(
-          'Logout',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            decoration: TextDecoration.underline,
-          ),
-        ),
-      ),
-    ),
-  );
-}
-
-
-
+//         if (confirmLogout == true) {
+//           final prefs = await SharedPreferences.getInstance();
+//           await prefs.remove('auth_token');
+//           Navigator.pushReplacementNamed(context, '/');
+//         }
+//       },
+//       child: const Center(
+//         child: Text(
+//           'Logout',
+//           style: TextStyle(
+//             color: Colors.white,
+//             fontSize: 16,
+//             fontWeight: FontWeight.bold,
+//             decoration: TextDecoration.underline,
+//           ),
+//         ),
+//       ),
+//     ),
+//   );
+// }
 }

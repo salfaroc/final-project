@@ -1,41 +1,46 @@
-import 'package:mongo_dart/mongo_dart.dart';
-
 class Admin {
-  ObjectId id;
-  String name;
-  String email;
-  int phone;
-  ObjectId permissionId; // Referencia a permissions
-  ObjectId addressId;    // Referencia a addresses
+  final String id;
+  final String name;
+  final String email;
+  final String password;
+  final String phone;
+  final List<String> permisos;
+  final String role;
+  final DateTime createdAt;
 
   Admin({
     required this.id,
     required this.name,
     required this.email,
+    required this.password,
     required this.phone,
-    required this.permissionId,
-    required this.addressId,
+    required this.permisos,
+    required this.role,
+    required this.createdAt,
   });
 
-  Map<String, dynamic> toMap() {
-    return {
-      '_id': id,
-      'name': name,
-      'email': email,
-      'phone': phone,
-      'permission_id': permissionId,
-      'address_id': addressId,
-    };
+  factory Admin.fromJson(Map<String, dynamic> json) {
+    return Admin(
+      id: json['_id'] ?? '',
+      name: json['name'] ?? '',
+      email: json['email'] ?? '',
+      password: json['password'] ?? '',
+      phone: json['phone'] ?? '',
+      permisos: List<String>.from(json['permisos'] ?? []),
+      role: json['role'] ?? '',
+      createdAt: DateTime.tryParse(json['created_at'] ?? '') ?? DateTime.now(),
+    );
   }
 
-  factory Admin.fromJson(Map<String, dynamic> map) {
-    return Admin(
-      id: map['_id'],
-      name: map['name'],
-      email: map['email'],
-      phone: map['phone'],
-      permissionId: map['permission_id'],
-      addressId: map['address_id'],
-    );
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'email': email,
+      'password': password,
+      'phone': phone,
+      'permisos': permisos,
+      'role': role,
+      'created_at': createdAt.toIso8601String(),
+    };
   }
 }

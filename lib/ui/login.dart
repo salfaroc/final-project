@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'signup.dart';
-import 'logged_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+// import 'signup.dart';
+// import 'logged_in.dart';
 import '../../services/api_service.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -15,6 +17,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _isLoading = false;
+  String selectedRole = 'customer';
 
   @override
   void dispose() {
@@ -25,26 +28,44 @@ class _LoginPageState extends State<LoginPage> {
 
   // llamada api_servie para que funcione la funcion incio Sesion Admin
   Future<void> _handleLogin() async {
-  setState(() {
-    _isLoading = true;
+    setState(() {
+      _isLoading = true;
   });
 
   try {
-    final token = await ApiService.loginAdmin(email: _emailController.text.trim(), password: _passwordController.text);
-    
+    final result  = await ApiService.login(
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+      role: selectedRole,
+    );
+
+    final decodedToken = JwtDecoder.decode(result['token']);
+    final role = decodedToken['role'];
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('auth_token', result['token']);
+    await prefs.setString('user_role', role);
+
     setState(() => _isLoading = false);
 
-    if (token.isNotEmpty) {
-      Navigator.pushNamed(context, '/logged_in');
+    if (role == 'admin') {
+      Navigator.pushReplacementNamed(context, '/logged_in');
+    } else if (role == 'customer') {
+      Navigator.pushReplacementNamed(context, '/logged_customer');
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Rol no reconocido')),
+      );
     }
   } catch (e) {
     setState(() => _isLoading = false);
-
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Error: ${e.toString()}')),
     );
   }
 }
+
+
 
 // diseño se la pagina 
   @override
@@ -56,7 +77,7 @@ class _LoginPageState extends State<LoginPage> {
         elevation: 0,
         titleSpacing: 24,
         title: const Text(
-          'S.ESE.ART',
+          'S.ESE.ART - login',
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
@@ -125,13 +146,32 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 24),
 
+                // Rol selector
+                DropdownButtonFormField<String>(
+                  value: selectedRole,
+                  decoration: const InputDecoration(
+                    labelText: 'Rol',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: 'admin', child: Text('Admin')),
+                    DropdownMenuItem(value: 'customer', child: Text('Customer')),
+                  ],
+                  onChanged: (value) {
+                    setState(() {
+                      selectedRole = value!;
+                    });
+                  },
+                ),
+                const SizedBox(height: 24),
+
                 // Login button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF2E1A47),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
                     ),
                     onPressed: _isLoading ? null : _handleLogin,
                     child: _isLoading
@@ -142,18 +182,18 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 16),
 
                  // Sign-up link
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pushNamed(context, '/signup');
-                  },
-                  child: const Text(
-                    "Don't have an account? Sign-up here!",
-                    style: TextStyle(
-                      color: Color(0xFF2E1A47),
-                      decoration: TextDecoration.underline,
-                    ),
-                  ),
-                ),
+                // GestureDetector(
+                //   onTap: () {
+                //     Navigator.pushNamed(context, '/signup');
+                //   },
+                //   child: const Text(
+                //     "Don't have an account? Sign-up here!",
+                //     style: TextStyle(
+                //       color: Color(0xFF2E1A47),
+                //       decoration: TextDecoration.underline,
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           ),
