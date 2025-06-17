@@ -25,21 +25,20 @@ class Product {
     required this.length,
   });
 
-  factory Product.fromJson(Map<String, dynamic> json) {
-    return Product(
-      id: json['_id'] != null ? ObjectId.fromHexString(json['_id']) : null,
-      image: json['image'],
-      name: json['name'],
-      description: json['description'],
-      price: (json['price'] as num).toDouble(),
-      category: json['category'],
-      stockQuantity: json['stock_quantity'],
-      createdAt: DateTime.parse(json['created_at']),
-      width: json['width'],
-      length: json['length'],
-    );
-  }
-
+factory Product.fromJson(Map<String, dynamic> json) {
+  return Product(
+    id: json['_id'] != null ? ObjectId.fromHexString(json['_id']) : null,
+    image: json['image'],
+    name: json['name'],
+    description: json['description'],
+    price: (json['price'] as num).toDouble(),
+    category: json['category'],
+    stockQuantity: json['stock_quantity'],
+    createdAt: DateTime.parse(json['created_at']),
+    width: json['width'],
+    length: json['length'],
+  );
+}
   Map<String, dynamic> toMap() {
     return {
       '_id': id?.oid,
@@ -54,6 +53,4 @@ class Product {
       'length' : length,
     };
   }
-
-
 }

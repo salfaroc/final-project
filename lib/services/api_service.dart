@@ -18,16 +18,16 @@ class ApiService {
   static const String baseUrl = 'http://localhost:5000'; 
 
   // -------------------- Obtener productos (GET /products) --------------------
-  static Future<List<Product>> fetchProducts() async {
-    final response = await http.get(Uri.parse('$baseUrl/products'));
+static Future<List<Product>> fetchProducts() async {
+  final response = await http.get(Uri.parse('$baseUrl/products'));
 
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-      return data.map((json) => Product.fromJson(json)).toList();
-    } else {
-      throw Exception('Error al cargar productos');
-    }
+  if (response.statusCode == 200) {
+    final List<dynamic> data = json.decode(response.body);
+    return data.map((json) => Product.fromJson(json)).toList();
+  } else {
+    throw Exception('Error al cargar productos');
   }
+}
 
 // ------------------------- LOGIN COMUN -------------
 static Future<Map<String, dynamic>> login({

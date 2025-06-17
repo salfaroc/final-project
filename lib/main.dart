@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart'; // flutter pub add google_fonts
+import 'package:seseart/models/collection_products.dart';
 import 'ui/home.dart';
 import 'ui/login.dart';
 import 'ui/signup.dart';
 import 'ui/logged_in.dart';
 import 'ui/logged_cutomer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'ui/product_card.dart';
 
 
 void main() async {
@@ -39,7 +41,11 @@ class MyApp extends StatelessWidget {
         '/signup': (context) => const SignUpPage(),
         '/logged_in': (context) => const LoggedInPage(),               // admin
         '/logged_customer': (context) => const LoggedCustomerPage(),  // cliente
+        '/product_detail': (context) {
+          final product = ModalRoute.of(context)!.settings.arguments as Product;
+          return ProductCard(product: product);
         // aquí más pantallas según necesites
+        }
       },
     );
   }
