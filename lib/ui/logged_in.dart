@@ -1,33 +1,48 @@
 import 'package:flutter/material.dart';
-// import 'package:auto_size_text/auto_size_text.dart'; // flutter pub add auto_size_text
-// import 'package:url_launcher/url_launcher.dart'; // flutter pub add url_launcher
-// import 'logged_in.dart';
-// import 'orders.dart';
-// import 'messages.dart';
-// import 'profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-// import '../../models/collection_products.dart';
-// import '../../services/api_service.dart';
-// import 'product_data.dart';
-// import 'product_card.dart';
 
-// final List<Product> products = getProducts();
-
-class LoggedInPage extends StatelessWidget {
+class LoggedInPage extends StatefulWidget {
   const LoggedInPage({super.key});
 
+  @override
+  State<LoggedInPage> createState() => _LoggedInPageState();
+}
+
+class _LoggedInPageState extends State<LoggedInPage> {
+  // Función de logout (no tocar)
   Future<void> _logout(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('admin_token');
     Navigator.pushReplacementNamed(context, '/login');
   }
 
+  // Estado de visibilidad de formularios
+  final Map<String, bool> _visibleSections = {};
+
+  // Botones disponibles
+  final Map<String, String> _buttons = {
+    "addProduct": "Añadir Producto",
+    "editProduct": "Modificar Producto",
+    "deleteProduct": " Eliminar Producto",
+    "editCustomer": " Modificar Datos Cliente",
+    "toggleCustomer": "Activar/Desactivar Cliente",
+    "viewCustomer": " Ver Datos Cliente",
+    "createCustomer": " Crear Cliente",
+    "listCustomers": "Ver Clientes",
+    "orders": " Ver Pedidos",
+    "offers": "Ver Ofertas",
+    "payments": "Ver Pagos",
+    "products": "Ver Productos",
+    "reviews": "Ver Reseñas",
+    "deleteReviews": "Borrar Reseñas",
+  };
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF2E1A47),
+        backgroundColor: const Color.fromARGB(255, 11, 113, 176),
         elevation: 0,
         titleSpacing: 24,
         title: const Text(
@@ -42,15 +57,8 @@ class LoggedInPage extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () => _logout(context),
-          )
-
-          // _buildMenuItem(context, 'Home', const LoggedInPage()),
-          // _buildMenuItem(context, 'My Orders', const OrdersPage()),
-          // _buildMenuItem(context, 'Messages', const MessagesPage()),
-          // _buildMenuItem(context, 'Profile', const ProfilePage()),
-          // _buildLogoutButton(context),
-  // const SizedBox(width: 24),
-        ], 
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -69,17 +77,15 @@ class LoggedInPage extends StatelessWidget {
                     ),
                     child: Stack(
                       children: [
-                        // Image
                         Positioned.fill(
                           child: ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(50),
                             child: Image.asset(
                               'assets/banner.jpg',
                               fit: BoxFit.cover,
                             ),
                           ),
                         ),
-                        // Text container
                         Positioned(
                           left: 24,
                           top: 30,
@@ -87,7 +93,7 @@ class LoggedInPage extends StatelessWidget {
                             padding: const EdgeInsets.all(12),
                             color: Colors.black.withOpacity(0.5),
                             child: const Text(
-                              'Discover Unique Artworks',
+                              'Admin Dashboard',
                               style: TextStyle(
                                 fontSize: 28,
                                 fontWeight: FontWeight.bold,
@@ -100,82 +106,68 @@ class LoggedInPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 40),
-                  // About Us
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Left-side image
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.asset(
-                          'assets/about_us.jpg',
-                          width: 500,
-                          height: 250,
-                          fit: BoxFit.cover,
+
+                  // --------  ADMIN BOTONES - ACCIONES --------
+                  const SizedBox(height: 20),
+                  GridView.count(
+                    shrinkWrap: true,
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    physics: const NeverScrollableScrollPhysics(),
+                    childAspectRatio: 3.2,
+                    children: _buttons.entries.map((entry) {
+                      final key = entry.key;
+                      final label = entry.value;
+                      return ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            _visibleSections[key] = !(_visibleSections[key] ?? false);
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color.fromARGB(255, 98, 162, 191),
                         ),
-                      ),
-                      const SizedBox(width: 24),
-                      // Right-side text
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text(
-                              'About us!',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 12),
-                            Text(
-                              'We are a passionate team of students from Centro Profesional JOYFE, currently in our final year of Desarrollo de Aplicaciones Multiplataforma (DAM). '
-                              'This project is our Trabajo de Fin de Grado (TFG), a milestone that reflects everything we’ve learned and achieved over the past two years.\n\n'
-                              'S.ESE.ART was born from our shared love for technology and creativity. We wanted to create a platform that’s both simple and elegant, '
-                              'where digital artworks can be discovered, appreciated, and shared by everyone.',
-                              style: TextStyle(fontSize: 16),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 40),
-                  // Product cards
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    child: Text(
-                      'All Products',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                        child: Text(label),
+                      );
+                    }).toList(),
                   ),
                   const SizedBox(height: 30),
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    padding: EdgeInsets.zero,
-                    // itemCount: products.length,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 4,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                          childAspectRatio: 0.7,
+
+                  // 🔽 FORMULARIOS VISIBLES
+                  ..._visibleSections.entries.where((e) => e.value).map((e) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Formulario: ${_buttons[e.key]}',
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                         ),
-                    itemBuilder: (context, index) {
-                      // return ProductCard(product: products[index]);
-                    },
-                  ),
+                        const SizedBox(height: 12),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(16),
+                          margin: const EdgeInsets.only(bottom: 20),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            'Aquí va el formulario para "${_buttons[e.key]}"',
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                        ),
+                      ],
+                    );
+                  }).toList(),
                 ],
               ),
             ),
+
             // Footer
             Container(
               width: double.infinity,
-              color: const Color(0xFF2E1A47),
+              color: const Color.fromARGB(255, 0, 0, 0),
               padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 24),
               child: Center(
                 child: ConstrainedBox(
@@ -183,7 +175,7 @@ class LoggedInPage extends StatelessWidget {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Meet the Team
+                      // Team Info
                       SizedBox(
                         width: 300,
                         child: Column(
@@ -201,7 +193,7 @@ class LoggedInPage extends StatelessWidget {
                             Text(
                               'Sara Alfaro Carrillo',
                               style: TextStyle(
-                                color: Colors.white70,
+                                color: Color.fromARGB(255, 255, 255, 255),
                                 fontSize: 16,
                               ),
                             ),
@@ -237,7 +229,7 @@ class LoggedInPage extends StatelessWidget {
                         color: Colors.white24,
                         margin: const EdgeInsets.symmetric(horizontal: 32),
                       ),
-                      // Legal and Technology
+                      // Legal Info
                       SizedBox(
                         width: 300,
                         child: Column(
@@ -304,68 +296,4 @@ class LoggedInPage extends StatelessWidget {
       ),
     );
   }
-
-  Widget _buildMenuItem(BuildContext context, String title, Widget page) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: GestureDetector(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => page),
-          );
-        },
-        child: Center(
-          child: Text(
-            title,
-            style: const TextStyle(color: Colors.white, fontSize: 16),
-          ),
-        ),
-      ),
-    );
-  }
-
-// Widget _buildLogoutButton(BuildContext context) {
-//   return Padding(
-//     padding: const EdgeInsets.symmetric(horizontal: 8),
-//     child: GestureDetector(
-//       onTap: () async {
-//         final confirmLogout = await showDialog<bool>(
-//           context: context,
-//           builder: (context) => AlertDialog(
-//             title: const Text('Cerrar sesión'),
-//             content: const Text('¿Estás seguro de que deseas cerrar sesión?'),
-//             actions: [
-//               TextButton(
-//                 onPressed: () => Navigator.of(context).pop(false),
-//                 child: const Text('Cancelar'),
-//               ),
-//               TextButton(
-//                 onPressed: () => Navigator.of(context).pop(true),
-//                 child: const Text('Cerrar sesión'),
-//               ),
-//             ],
-//           ),
-//         );
-
-//         if (confirmLogout == true) {
-//           final prefs = await SharedPreferences.getInstance();
-//           await prefs.remove('auth_token');
-//           Navigator.pushReplacementNamed(context, '/');
-//         }
-//       },
-//       child: const Center(
-//         child: Text(
-//           'Logout',
-//           style: TextStyle(
-//             color: Colors.white,
-//             fontSize: 16,
-//             fontWeight: FontWeight.bold,
-//             decoration: TextDecoration.underline,
-//           ),
-//         ),
-//       ),
-//     ),
-//   );
-// }
 }
