@@ -3,14 +3,14 @@ import '../../models/collection_products.dart';
 import '../../services/api_service.dart';
 import '../ui/product_card.dart'; 
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class LoggedCustomer extends StatefulWidget {
+  const LoggedCustomer({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<LoggedCustomer> createState() => _LoggedCustomer();
 }
 
-class _HomePageState extends State<HomePage> {
+class _LoggedCustomer extends State<LoggedCustomer> {
   List<Product> products = [];
   bool isLoading = true;
   String? error;
@@ -31,7 +31,6 @@ class _HomePageState extends State<HomePage> {
       });
     } catch (e) {
       setState(() {
-        print('Productos no cargados');
         error = e.toString();
         isLoading = false;
       });
@@ -43,11 +42,11 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF2E1A47),
+        backgroundColor: const Color.fromRGBO(37, 112, 130, 1),
         elevation: 0,
         titleSpacing: 24,
         title: const Text(
-          'S.ESE.ART - home',
+          'S.ESE.ART - LoggedCustomer',
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
@@ -55,8 +54,8 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         actions: [
-          _buildMenuItem(context, 'Home', '/'),
-          _buildMenuItem(context, 'Login', '/login'),
+          _buildMenuItem(context, 'ShoppingCart', '/shopping_cart'),
+          _buildMenuItem(context, 'Profile', '/profile'),
           const SizedBox(width: 24),
         ],
       ),
@@ -244,7 +243,7 @@ class _HomePageState extends State<HomePage> {
 Widget _buildFooter() {
   return Container(
     width: double.infinity,
-    color: const Color(0xFF2E1A47),
+    color: const Color.fromRGBO(37, 112, 130, 1),
     padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24), // menos alto
     child: Center(
       child: FittedBox(

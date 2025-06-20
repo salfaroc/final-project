@@ -1,41 +1,44 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 // import '../models/collection_addresses.dart';
-import '../models/collection_admins.dart';
-import '../models/collection_chats.dart';
 // import '../models/collection_customerBackup.dart';
 // import '../models/collection_customers.dart';
 // import '../models/collection_offers.dart';
 // import '../models/collection_orders.dart';
 // import '../models/collection_payments.dart';
 // import '../models/collection_permissions.dart';
-import '../models/collection_products.dart';
 // import '../models/collection_reviews.dart';
 // import '../models/collection_shoppingCart.dart';
 
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:seseart/models/collection_shoppingCart.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../models/collection_products.dart';
+import '../models/collection_admins.dart';
+import '../models/collection_chats.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
+
 class ApiService {
-  static const String baseUrl = 'http://localhost:5000'; 
+  static const String baseUrl = 'http://localhost:5000';
 
-  // -------------------- Obtener productos (GET /products) --------------------
-static Future<List<Product>> fetchProducts() async {
-  final response = await http.get(Uri.parse('$baseUrl/products'));
-
-  if (response.statusCode == 200) {
-    final List<dynamic> data = json.decode(response.body);
-    return data.map((json) => Product.fromJson(json)).toList();
-  } else {
-    throw Exception('Error al cargar productos');
+  // ---------- Helper: Obtener token guardado ----------
+  static Future<String> _getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('auth_token');
+    if (token == null) {
+      throw Exception('User not logged in');
+    }
+    return token;
   }
-}
 
-// ------------------------- LOGIN COMUN -------------
-static Future<Map<String, dynamic>> login({
+// ---------- Autenticación ----------
+
+  // Login común (admin o customer)
+  static Future<Map<String, dynamic>> login({
     required String email,
     required String password,
     required String role, // 'admin' o 'customer'
   }) async {
-    final url = Uri.parse('$baseUrl/comun/login');
+    final url = Uri.parse('$baseUrl/login');
 
     final response = await http.post(
       url,
@@ -52,13 +55,18 @@ static Future<Map<String, dynamic>> login({
       final token = data['token'];
       final userRole = data['role'];
 
+      final decodedToken = JwtDecoder.decode(token);
+      final userId = decodedToken['user_id'];
+
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('auth_token', token);
       await prefs.setString('user_role', userRole);
+      await prefs.setString('user_id', userId);
 
       return {
         'token': token,
         'role': userRole,
+        'user_id': userId,
       };
     } else {
       final error = jsonDecode(response.body)['error'] ?? 'Login fallido';
@@ -66,88 +74,16 @@ static Future<Map<String, dynamic>> login({
     }
   }
 
-  /// ---------------------  REGISTER COMÚN
-  static Future<String> register(Map<String, dynamic> userData) async {
-    final url = Uri.parse('$baseUrl/comun/register');
+// ---------- Admins ----------
 
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(userData),
-    );
-
-    if (response.statusCode == 201) {
-      final data = jsonDecode(response.body);
-      return data['message']; // Ej: "Admin registrado" o "Customer registrado"
-    } else {
-      final error = jsonDecode(response.body);
-      throw Exception(error['error'] ?? 'Error desconocido');
-    }
-  }
-
-  // // -------------------- Registrar administrador (POST /adminRegister) --------------------
-  // static Future<Map<String, dynamic>> registerAdmin({
-  //   required String name,
-  //   required String email,
-  //   required String password,
-  //   required String phone,
-  //   required List<String> permisos,
-  //   required String token,
-  // }) async {
-  //   final url = Uri.parse('$baseUrl/adminRegister');
-  //   final body = json.encode({
-  //     "name": name,
-  //     "email": email,
-  //     "password": password,
-  //     "phone": phone,
-  //     "permisos": permisos,
-  //   });
-
-  //   final response = await http.post(
-  //     url,
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //       "Authorization": "Bearer $token",
-  //     },
-  //     body: body,
-  //   );
-
-  //   if (response.statusCode == 201) {
-  //     return json.decode(response.body);
-  //   } else {
-  //     throw Exception('Error al registrar admin: ${response.body}');
-  //   }
-  // }
-
-//   // -------------------- Iniciar Sesion Admin (POST /loginAdmin) --------------------
-  
-// static Future<String> loginAdmin({
-//   required String email,
-//   required String password,
-// }) async {
-//   final url = Uri.parse('$baseUrl/admin/loginAdmin');
-
-//   final response = await http.post(
-//     url,
-//     headers: {'Content-Type': 'application/json'},
-//     body: jsonEncode({'email': email, 'password': password}),
-//   );
-
-//   if (response.statusCode == 200) {
-//     final data = jsonDecode(response.body);
-//     return data['token'];
-//   } else {
-//     throw Exception('Login fallido: ${response.body}');
-//   }
-// }
-
-
-  // -------------------- Obtener todos los admins (GET /admin) --------------------
-  static Future<List<Admin>> fetchAdmins(String token) async {
+  // Obtener todos los admins
+  static Future<List<Admin>> fetchAdmins() async {
+    final token = await _getToken();
     final response = await http.get(
       Uri.parse('$baseUrl/admin'),
       headers: {
         "Authorization": "Bearer $token",
+        'Content-Type': 'application/json',
       },
     );
 
@@ -155,32 +91,36 @@ static Future<Map<String, dynamic>> login({
       final List<dynamic> data = json.decode(response.body);
       return data.map((json) => Admin.fromJson(json)).toList();
     } else {
-      throw Exception('Error al cargar admins');
+      throw Exception('Failed to load admins: ${response.body}');
     }
   }
 
-  // -------------------- 4. Obtener admin por ID (GET /admin/<id>) --------------------
-  static Future<Admin> fetchAdminById(String adminId, String token) async {
+  // Obtener admin por email
+  static Future<Admin> fetchAdminById(String email) async {
+    final token = await _getToken();
     final response = await http.get(
-      Uri.parse('$baseUrl/admin/$adminId'),
+      Uri.parse('$baseUrl/admin/$email'),
       headers: {
         "Authorization": "Bearer $token",
+        'Content-Type': 'application/json',
       },
     );
 
     if (response.statusCode == 200) {
-      return Admin.fromJson(json.decode(response.body));
+      // return Admin.fromJson(json.decode(response.body));
+      final data = json.decode(response.body);
+      return Admin.fromJson(data);
     } else {
-      throw Exception('Error al cargar admin por ID');
+      throw Exception('Failed to load admin: ${response.body}');
     }
   }
 
-  // -------------------- 5. Actualizar admin (PUT /admin/<id>) --------------------
-  static Future<void> updateAdmin({
+  // Actualizar admin por email
+  static Future<bool> updateAdmin({
     required String adminId,
     required Map<String, dynamic> updateData,
-    required String token,
   }) async {
+    final token = await _getToken();
     final response = await http.put(
       Uri.parse('$baseUrl/admin/$adminId'),
       headers: {
@@ -190,13 +130,18 @@ static Future<Map<String, dynamic>> login({
       body: json.encode(updateData),
     );
 
-    if (response.statusCode != 200) {
-      throw Exception('Error al actualizar admin: ${response.body}');
+    if (response.statusCode == 200) {
+      return true;  // Éxito
+    } else {
+      // Puedes lanzar excepción o solo devolver false
+      // throw Exception('Failed to update admin: ${response.body}');
+      return false;  // Falló la actualización
     }
   }
 
-  // -------------------- 6. Eliminar admin (DELETE /admin/<id>) --------------------
-  static Future<void> deleteAdmin(String adminId, String token) async {
+  // Eliminar admin por email
+  static Future<bool> deleteAdmin(String adminId) async {
+    final token = await _getToken();
     final response = await http.delete(
       Uri.parse('$baseUrl/admin/$adminId'),
       headers: {
@@ -204,63 +149,19 @@ static Future<Map<String, dynamic>> login({
       },
     );
 
-    if (response.statusCode != 200) {
-      throw Exception('Error al eliminar admin');
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw Exception('Failed to delete admin: ${response.body}');
     }
   }
 
-  // // -------------------- 7. Registrar cliente (POST /registerCustomer) --------------------
-  // static Future<Map<String, dynamic>> registerCustomer({
-  //   required String name,
-  //   required String email,
-  //   required String password,
-  //   // Otros campos que tengas en el modelo cliente
-  // }) async {
-  //   final url = Uri.parse('$baseUrl/registerCustomer');
-  //   final body = json.encode({
-  //     "name": name,
-  //     "email": email,
-  //     "password": password,
-  //     // Añadir más campos si aplican
-  //   });
+  // ---------- Customers ----------
 
-  //   final response = await http.post(
-  //     url,
-  //     headers: {"Content-Type": "application/json"},
-  //     body: body,
-  //   );
-
-  //   if (response.statusCode == 201) {
-  //     return json.decode(response.body);
-  //   } else {
-  //     throw Exception('Error al registrar cliente: ${response.body}');
-  //   }
-  // }
-
-  // // ------------------- LOGIN CUSTOMER -------------------
-  // static Future<String> loginCustomer({required String email, required String password}) async {
-  //   final url = Uri.parse('$baseUrl/loginCustomer');
-  //   final response = await http.post(
-  //     url,
-  //     headers: {'Content-Type': 'application/json'},
-  //     body: jsonEncode({'email': email, 'password': password}),
-  //   );
-
-  //   if (response.statusCode == 200) {
-  //     final data = jsonDecode(response.body);
-  //     final token = data['token'];
-  //     final prefs = await SharedPreferences.getInstance();
-  //     await prefs.setString('auth_token', token);
-  //     return token;
-  //   } else {
-  //     throw Exception(jsonDecode(response.body)['error'] ?? 'Error al iniciar sesión');
-  //   }
-  // }
-
-
-  // ------------------- VIEW CUSTOMER BY ID -------------------
-  static Future<Map<String, dynamic>> viewCustomer(String id, String token) async {
-    final url = Uri.parse('$baseUrl/view_customer/$id');
+  // Ver cliente por emmail
+  static Future<Map<String, dynamic>> getCustomerByEmail(String email) async {
+    final token = await _getToken();
+    final url = Uri.parse('$baseUrl/customer/$email');
     final response = await http.get(
       url,
       headers: {'Authorization': 'Bearer $token'},
@@ -273,9 +174,27 @@ static Future<Map<String, dynamic>> login({
     }
   }
 
-  // ------------------- UPDATE CUSTOMER -------------------
-  static Future<void> updateCustomer(String id, Map<String, dynamic> updates, String token) async {
-    final url = Uri.parse('$baseUrl/update_customer/$id');
+ // Obtener todos los clientes
+  static Future<List<dynamic>> getAllCustomers() async {
+    final token = await _getToken();
+    final url = Uri.parse('$baseUrl/customer');
+    final response = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception(jsonDecode(response.body)['error'] ?? 'Error al obtener todos los clientes');
+    }
+  }
+
+
+  // Actualizar cliente por emmail
+  static Future<void> updateCustomerByEmail(String email, Map<String, dynamic> updates) async {
+    final token = await _getToken();
+    final url = Uri.parse('$baseUrl/customer/$email');
     final response = await http.put(
       url,
       headers: {
@@ -290,9 +209,10 @@ static Future<Map<String, dynamic>> login({
     }
   }
 
-  // ------------------- DEACTIVATE CUSTOMER -------------------
-  static Future<void> deactivateCustomer(String id, String token) async {
-    final url = Uri.parse('$baseUrl/deactivateCustomer/$id');
+  // Desactivar cliente por emmail
+  static Future<void> deactivateCustomer(String email) async {
+    final token = await _getToken();
+    final url = Uri.parse('$baseUrl/deactivateCustomer/$email');
     final response = await http.delete(
       url,
       headers: {'Authorization': 'Bearer $token'},
@@ -303,9 +223,10 @@ static Future<Map<String, dynamic>> login({
     }
   }
 
-  // ------------------- REACTIVATE CUSTOMER -------------------
-  static Future<void> reactivateCustomer(String id, String token) async {
-    final url = Uri.parse('$baseUrl/reactivateCustomer/$id');
+  // Reactivar cliente por emmail
+  static Future<void> reactivateCustomer(String email) async {
+    final token = await _getToken();
+    final url = Uri.parse('$baseUrl/reactivateCustomer/$email');
     final response = await http.post(
       url,
       headers: {'Authorization': 'Bearer $token'},
@@ -316,8 +237,9 @@ static Future<Map<String, dynamic>> login({
     }
   }
 
-  // ------------------- LIST ACTIVE CUSTOMERS -------------------
-  static Future<List<dynamic>> getActiveCustomers(String token) async {
+  // Listar clientes activos por emmail
+  static Future<List<dynamic>> getActiveCustomers() async {
+    final token = await _getToken();
     final url = Uri.parse('$baseUrl/customers');
     final response = await http.get(
       url,
@@ -331,8 +253,9 @@ static Future<Map<String, dynamic>> login({
     }
   }
 
-  // ------------------- LIST DEACTIVATED CUSTOMERS -------------------
-  static Future<List<dynamic>> getDeactivatedCustomers(String token) async {
+  // Listar clientes desactivados por emmail
+  static Future<List<dynamic>> getDeactivatedCustomers() async {
+    final token = await _getToken();
     final url = Uri.parse('$baseUrl/customers/deactivated');
     final response = await http.get(
       url,
@@ -346,46 +269,223 @@ static Future<Map<String, dynamic>> login({
     }
   }
 
-  // -------------------- 15. Obtener historial de chat (GET /chat/chatHistory/<user_id>) --------------------
-  static Future<List<Chat>> fetchChatHistory(String userId, String token) async {
-    final response = await http.get(
-      Uri.parse('$baseUrl/chat/chatHistory/$userId'),
-      headers: {"Authorization": "Bearer $token"},
-    );
 
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-      return data.map((json) => Chat.fromJson(json)).toList();
-    } else {
-      throw Exception('Error al obtener historial de chat');
-    }
+  // ---------- Productos ----------
+  // Obtener producto por nombre
+static Future<Map<String, dynamic>> getProductByName(String productName) async {
+  final token = await _getToken();
+  final url = Uri.parse('$baseUrl/products/$productName');
+
+  final response = await http.get(
+    url,
+    headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    return jsonDecode(response.body);
+  } else {
+    final error = jsonDecode(response.body)['error'] ?? 'Error al obtener producto';
+    throw Exception(error);
   }
+}
 
-  // -------------------- 16. Crear chat (POST /chat) --------------------
-  static Future<void> createChatMessage(Map<String, dynamic> chatData, String token) async {
+  // Obtener todos los productos
+  static Future<List<Product>> fetchProducts() async {
+  final url = Uri.parse('$baseUrl/products');
+  final response = await http.post(
+    url,
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({'user_data': 'public'}),
+  );
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+    final List<Product> products =
+        (data['products'] as List).map((item) => Product.fromJson(item)).toList();
+    return products;
+  } else {
+    throw Exception('Error loading products: ${response.statusCode}');
+  }
+}
+
+
+  // Crear producto
+  static Future<void> createProduct(Map<String, dynamic> productData) async {
+    final token = await _getToken();
     final response = await http.post(
-      Uri.parse('$baseUrl/chat'),
+      Uri.parse('$baseUrl/products'),
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer $token",
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
       },
-      body: json.encode(chatData),
+      body: jsonEncode(productData),
     );
 
     if (response.statusCode != 201) {
-      throw Exception('Error al crear mensaje de chat');
+      throw Exception('Error al crear producto: ${response.body}');
     }
   }
 
-  // -------------------- 17. Eliminar chat (DELETE /chat/<chat_id>) --------------------
-  static Future<void> deleteChat(String chatId, String token) async {
-    final response = await http.delete(
-      Uri.parse('$baseUrl/chat/$chatId'),
-      headers: {"Authorization": "Bearer $token"},
+  // Actualizar producto
+  static Future<void> updateProduct(String productId, Map<String, dynamic> updateData) async {
+    final token = await _getToken();
+    final response = await http.put(
+      Uri.parse('$baseUrl/products/$productId'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(updateData),
     );
 
     if (response.statusCode != 200) {
-      throw Exception('Error al eliminar chat');
+      throw Exception('Error al actualizar producto: ${response.body}');
     }
   }
+
+  // Eliminar producto
+  static Future<void> deleteProduct(String productId) async {
+    final token = await _getToken();
+    final response = await http.delete(
+      Uri.parse('$baseUrl/products/$productId'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Error al eliminar producto');
+    }
+  }
+
+
+
+  // ---------- Ordenes ----------
+
+  // Ver detalles de orden
+  static Future<Map<String, dynamic>> viewOrderDetails(String orderId) async {
+    final token = await _getToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl/orders/$orderId'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Error al obtener detalles de la orden');
+    }
+  }
+
+  // Actualizar estado de orden
+  static Future<void> updateOrderStatus(String orderId, Map<String, dynamic> statusData) async {
+    final token = await _getToken();
+    final response = await http.put(
+      Uri.parse('$baseUrl/orders/$orderId/status'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(statusData),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Error al actualizar estado de orden');
+    }
+  }
+
+
+
+
+//  ----- CUSTOMER -------------------------------------
+
+ // ---------- Carrito ----------
+
+  // Obtener productos del carrito del usuario logueado
+  static Future<List<ShoppingCartItem>> fetchCartItems() async {
+    final token = await _getToken();
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('user_id');
+    if (userId == null) {
+      throw Exception('User ID no encontrado');
+    }
+
+    final url = Uri.parse('$baseUrl/cart');
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> cartJson = jsonDecode(response.body);
+      return cartJson.map((json) => ShoppingCartItem.fromJson(json)).toList();
+    } else {
+      throw Exception('Error cargando el carrito: ${response.body}');
+    }
+  }
+
+  // Añadir producto al carrito
+  static Future<void> addToCart(Map<String, dynamic> data) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('auth_token');
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/cart'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: json.encode(data),
+    );
+
+    if (response.statusCode != 201) {
+      throw Exception('Error al añadir al carrito: ${response.body}');
+    }
+  }
+
+  
+  // ---------- Registro (admin o customer)
+  static Future<String> register(Map<String, dynamic> userData) async {
+    final url = Uri.parse('$baseUrl/register');
+
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(userData),
+    );
+
+    if (response.statusCode == 201) {
+      final data = jsonDecode(response.body);
+      return data['message'];
+    } else {
+      final error = jsonDecode(response.body);
+      throw Exception(error['error'] ?? 'Error desconocido');
+    }
+  }
+
+
+
+// Crear orden
+  static Future<void> createOrder(Map<String, dynamic> orderData) async {
+    final token = await _getToken();
+    final response = await http.post(
+      Uri.parse('$baseUrl/orders'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(orderData),
+    );
+
+    if (response.statusCode != 201) {
+      throw Exception('Error al crear orden: ${response.body}');
+    }
+  }
+
+  
 }

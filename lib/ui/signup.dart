@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 import 'package:seseart/services/api_service.dart';
+import 'package:seseart/ui/logged_customer.dart';
 import 'logged_in.dart';
+
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -53,74 +55,82 @@ class _SignUpPageState extends State<SignUpPage> {
     super.dispose();
   }
 
-  Future<void> _handleSignUp() async {
-    if (!_formKey.currentState!.validate()) return;
+ Future<void> _handleSignUp() async {
+  if (!_formKey.currentState!.validate()) return;
 
-    if (_passwordController.text != _confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Las contraseñas no coinciden')),
-      );
-      return;
+  if (_passwordController.text != _confirmPasswordController.text) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Las contraseñas no coinciden')),
+    );
+    return;
+  }
+
+  setState(() => _isLoading = true);
+
+  try {
+    // Elimina esta parte:
+    // final prefs = await SharedPreferences.getInstance();
+    // final token = prefs.getString('auth_token') ?? '';
+    // if (token.isEmpty) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(content: Text('No estás autorizado para registrar')),
+    //   );
+    //   setState(() => _isLoading = false);
+    //   return;
+    // }
+
+    Map<String, dynamic> userData;
+
+    if (_selectedRole == 'admin') {
+      userData = {
+        'email': _emailController.text.trim(),
+        'password': _passwordController.text.trim(),
+        'role': 'admin',
+      };
+    } else {
+      userData = {
+        'name': _nameController.text.trim(),
+        'first_surname': _firstSurnameController.text.trim(),
+        'second_surname': _secondSurnameController.text.trim(),
+        'email': _emailController.text.trim(),
+        'password': _passwordController.text.trim(),
+        'phone': _phoneController.text.trim(),
+        'pais': _paisController.text.trim(),
+        'ciudad': _ciudadController.text.trim(),
+        'provincia': _provinciaController.text.trim(),
+        'codigo_postal': _codigoPostalController.text.trim(),
+        'gender': _genderController.text.trim(),
+        'fecha_nacimiento': _fechaNacimientoController.text.trim(),
+        'role': 'customer',
+      };
     }
 
-    setState(() => _isLoading = true);
+    await ApiService.register(userData);
 
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('auth_token') ?? '';
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Registro exitoso')),
+    );
 
-      if (token.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No estás autorizado para registrar')),
-        );
-        setState(() => _isLoading = false);
-        return;
-      }
-
-      Map<String, dynamic> userData;
-
-      if (_selectedRole == 'admin') {
-        userData = {
-          'email': _emailController.text.trim(),
-          'password': _passwordController.text.trim(),
-          'role': 'admin',
-        };
-      } else {
-        userData = {
-          'name': _nameController.text.trim(),
-          'first_surname': _firstSurnameController.text.trim(),
-          'second_surname': _secondSurnameController.text.trim(),
-          'email': _emailController.text.trim(),
-          'password': _passwordController.text.trim(),
-          'phone': _phoneController.text.trim(),
-          'pais': _paisController.text.trim(),
-          'ciudad': _ciudadController.text.trim(),
-          'provincia': _provinciaController.text.trim(),
-          'codigo_postal': _codigoPostalController.text.trim(),
-          'gender': _genderController.text.trim(),
-          'fecha_nacimiento': _fechaNacimientoController.text.trim(),
-          'role': 'customer',
-        };
-      }
-
-      await ApiService.register(userData);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registro exitoso')),
-      );
-
-      Navigator.pushReplacement(
+    if (_selectedRole == 'admin') {
+    Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const LoggedInPage()),
       );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}')),
+    } else {
+    print("Navigating to customer page...");
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoggedCustomer()),
       );
-    } finally {
-      setState(() => _isLoading = false);
     }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error: ${e.toString()}')),
+    );
+  } finally {
+    setState(() => _isLoading = false);
   }
+}
 
   Widget _buildTextField(TextEditingController controller, String label,
       {bool obscureText = false, VoidCallback? toggleObscure, TextInputType keyboardType = TextInputType.text}) {

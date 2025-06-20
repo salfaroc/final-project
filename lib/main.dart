@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart'; // flutter pub add google_fonts
 import 'package:seseart/models/collection_products.dart';
+import 'package:seseart/models/collection_shoppingCart.dart';
 import 'ui/home.dart';
 import 'ui/login.dart';
 import 'ui/signup.dart';
 import 'ui/logged_in.dart';
-import 'ui/logged_cutomer.dart';
+import 'ui/logged_customer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'ui/product_card.dart';
-
+import 'ui/shopping_cart.dart';  
+import 'ui/profile.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,13 +41,14 @@ class MyApp extends StatelessWidget {
         '/': (context) => const HomePage(),
         '/login': (context) => const LoginPage(),
         '/signup': (context) => const SignUpPage(),
-        '/logged_in': (context) => const LoggedInPage(),               // admin
-        '/logged_customer': (context) => const LoggedCustomerPage(),  // cliente
+        '/logged_in': (context) => const LoggedInPage(),          // admin
+        '/logged_customer': (context) => const LoggedCustomer(),  // cliente
         '/product_detail': (context) {
           final product = ModalRoute.of(context)!.settings.arguments as Product;
           return ProductCard(product: product);
-        // aquí más pantallas según necesites
-        }
+        },
+        '/shopping_cart': (context) => const ShoppingCartPage(),   
+        '/profile': (context) => const ProfilePage(),
       },
     );
   }
